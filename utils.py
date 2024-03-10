@@ -8,7 +8,7 @@ def send_otp_code(phone_number, code):
         params = {
             'sender': '',  # optional
             'receptor': phone_number,  # multiple mobile number, split by comma
-            'message': 'salam',
+            'message': code,
         }
         response = api.sms_send(params)
         print(response)

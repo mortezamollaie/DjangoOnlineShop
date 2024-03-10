@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
+
 class Category(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
@@ -12,6 +13,10 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('home:category_filter', args=[self.slug, ])
+
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
@@ -25,10 +30,10 @@ class Product(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ('name', )
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('home:product_detail', args=[self.slug,])
+        return reverse('home:product_detail', args=[self.slug, ])

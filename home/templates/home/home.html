@@ -6,14 +6,16 @@
 {% endblock %}
 
 {% block content %}
-    <div class="card-group">
+    {% for category in categories %}
+        <a href="{{ category.get_absolute_url }}" class="btn btn-info">{{ category.name }}</a>
+    {% endfor %}
+    <br/><br/>
     {% for product in products %}
-        <div class="card" style="max-width: 18rem;">
-            <img src="{{ product.image.url }}" class="card-img-top"  style="max-width: 18rem; max-height: 14rem">
+        <div class="card" style="width: 18rem; display:inline-block">
+            <img src="{{ product.image.url }}" class="card-img-top"  style="max-width: 18rem; max-height: 14rem" alt="">
             <div class="card-body">
                 <a href="{{ product.get_absolute_url }}" class="card-title">{{ product.name }}</a>
             </div>
         </div>
     {% endfor %}
-    </div>
 {% endblock %}

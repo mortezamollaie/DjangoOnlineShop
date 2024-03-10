@@ -1,7 +1,8 @@
 from django import forms
-from .models import User
+from .models import User, OtpCode
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+
 
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(label='password', widget=forms.PasswordInput)
@@ -24,6 +25,7 @@ class UserCreationForm(forms.ModelForm):
             user.save()
         return user
 
+
 class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField(help_text="you can change password using <a href=\"../password\">this form</a>")
 
@@ -31,7 +33,8 @@ class UserChangeForm(forms.ModelForm):
         model = User
         fields = ('email', 'phone_number', 'full_name', 'password', 'last_login')
 
-class UserRegisterationForm(forms.Form):
+
+class UserRegistrationForm(forms.Form):
     email = forms.EmailField()
     full_name = forms.CharField(label='full name')
     phone = forms.CharField(max_length=11)
@@ -49,7 +52,9 @@ class UserRegisterationForm(forms.Form):
         user = User.objects.filter(phone_number=phone).exists()
         if user:
             raise ValidationError('This phone number already exists')
+        OtpCode.objects.filter(phone_number=phone).delete()
         return phone
+
 
 class VerifyCodeForm(forms.Form):
     code = forms.IntegerField()
