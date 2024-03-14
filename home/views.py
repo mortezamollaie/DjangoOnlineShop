@@ -5,7 +5,7 @@ from . import tasks
 from django.contrib import messages
 from bucket import bucket
 from utils import IsAdminUserMixin
-from orders.form import CartAddForm
+from orders.forms import CartAddForm
 
 
 class HomeView(View):
