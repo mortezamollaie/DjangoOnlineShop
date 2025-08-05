@@ -4,3 +4,4 @@ psycopg2-binary>=2.9.5
 python-decouple>=3.6
 dj-database-url>=2.0.0
 whitenoise>=6.2.0
+pillow==11.3.0
