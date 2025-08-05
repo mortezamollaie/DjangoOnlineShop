@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_headers%}
+    <link rel="stylesheet" href="{% static 'home/css/style.css' %}">
+{% endblock %}
 
 {% block content %}
-    <h1>Hello User</h1>
+    <h3>Hello User</h3>
 {% endblock %}
