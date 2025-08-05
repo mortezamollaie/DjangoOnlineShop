@@ -9,24 +9,15 @@ from django.contrib import messages
 
 class UserRegisterView(View):
     form_class = UserRegistrationForm
+    template_name = 'accounts/register.html'
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
-        return render(request, 'accounts/register.html', {'form': form})
+        return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            user = User.objects.filter(phone_number=form.cleaned_data['phone']).first()
-            if user:
-                messages.error(request, 'User with this phone number already exists.', 'danger')
-                return redirect('accounts:user_register')
-
-            user = User.objects.filter(email=form.cleaned_data['email']).first()
-            if user:
-                messages.error(request, 'User with this email already exists.', 'danger')
-                return redirect('accounts:user_register')
-
             random_code = random.randint(1000, 9999)
             send_otp_code(form.cleaned_data['phone'], random_code)
             OtpCode.objects.create(phone_number=form.cleaned_data['phone'], code=random_code)
@@ -38,7 +29,7 @@ class UserRegisterView(View):
             }
             messages.success(request, 'we sent you a code', 'success')
             return redirect('accounts:verify_code')
-        return redirect('home:home')    
+        return render(request, self.template_name, {'form': form})    
 
 
 class UserRegisterVerifyCodeView(View):
