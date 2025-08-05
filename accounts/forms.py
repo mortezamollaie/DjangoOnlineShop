@@ -50,7 +50,7 @@ class UserRegistrationForm(forms.Form):
 
     def clean_phone(self):
         phone = self.cleaned_data['phone']
-        phone = User.objects.filter(phone_number=phone).exists()
+        user = User.objects.filter(phone_number=phone).exists()
         if user:
             raise ValidationError('This is phone number already exists')
         return phone           

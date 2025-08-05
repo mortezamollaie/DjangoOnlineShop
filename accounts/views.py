@@ -5,6 +5,8 @@ import random
 from utils import send_otp_code
 from .models import OtpCode, User
 from django.contrib import messages
+from django.utils import timezone
+from datetime import timedelta
 
 
 class UserRegisterView(View):
@@ -45,6 +47,12 @@ class UserRegisterVerifyCodeView(View):
         form = self.form_class(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
+
+            now = timezone.now()
+            if now - code_instance.created > timedelta(minutes=2):
+                messages.error(request, 'The verification code has expired. Please try again.', 'danger')
+                return redirect('accounts:verify_code')
+
             if int(cd['code']) == int(code_instance.code):
                 User.objects.create_user(
                     phone_number = user_session['phone_number'],
