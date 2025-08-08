@@ -11,3 +11,12 @@ class Bucket:
             endpoint_url = settings.AWS_S3_ENDPOINT_URL,
         )
         
+
+    def get_objects(self):
+        result = self.conn.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
+        if result['KeyCount'] > 0:
+            return result['Contents']
+        return []
+
+
+bucket = Bucket()
