@@ -7,7 +7,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djangoshop.settings')
 celery_app = Celery('djangoshop')
 celery_app.autodiscover_tasks()
 
-celery_app.conf.broker_url = 'amqp://rabbitmq'
+celery_app.conf.broker_url = 'amqp://guest:guest@rabbit:5672//'
 celery_app.conf.result_backend = 'rpc://'
 celery_app.conf.task_serializer = 'json'
 celery_app.conf.result_serializer = 'pickle'
