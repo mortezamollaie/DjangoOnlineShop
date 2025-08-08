@@ -24,4 +24,9 @@ class Bucket:
         return True
 
 
+    def download_object(self, key):
+        with open(settings.AWS_LOCAL_STORAGE + '/' + key, 'wb') as f:
+            self.conn.download_fileobj(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=key, Fileobj=f)
+
+
 bucket = Bucket()

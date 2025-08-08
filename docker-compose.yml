@@ -17,6 +17,11 @@ services:
       - "5673:5672"     # AMQP
       - "15673:15672"   # UI dashboard
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   web:
     build: .
@@ -36,15 +41,16 @@ services:
 
   celery:
     build: .
-    command: >
-      sh -c "sleep 10 && celery -A djangoshop worker --loglevel=info"
+    command: celery -A djangoshop worker --loglevel=info
     volumes:
       - .:/app
     env_file:
       - .env
     depends_on:
-      - web
-      - rabbit
+      rabbit:
+        condition: service_healthy
+      web:
+        condition: service_started
     restart: unless-stopped
 
 volumes:
