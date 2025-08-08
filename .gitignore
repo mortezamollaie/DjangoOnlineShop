@@ -8,3 +8,4 @@ media/
 .DS_Store
 .vscode/
 staticfiles_collected/
+/aws/
