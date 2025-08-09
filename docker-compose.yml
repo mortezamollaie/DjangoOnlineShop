@@ -10,17 +10,22 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   rabbit:
     image: rabbitmq:3-management
     ports:
-      - "5673:5672"     # AMQP
-      - "15673:15672"   # UI dashboard
+      - "5674:5672"     # AMQP (changed from 5673 to 5674)
+      - "15674:15672"   # UI dashboard (changed from 15673 to 15674)
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 5s
-      timeout: 3s
+      interval: 10s
+      timeout: 5s
       retries: 5
 
   web:
@@ -29,29 +34,40 @@ services:
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - .:/app
+      - .:/app:cached
     ports:
       - "8000:8000"
     env_file:
       - .env
     depends_on:
-      - db
-      - rabbit
+      db:
+        condition: service_healthy
+      rabbit:
+        condition: service_healthy
     restart: unless-stopped
+    # Fix permission issues
+    user: "1000:1000"  # or use $(id -u):$(id -g) on Linux
 
   celery:
     build: .
-    command: celery -A djangoshop worker --loglevel=info
+    command: celery -A djangoshop worker --loglevel=info --concurrency=2
     volumes:
-      - .:/app
+      - .:/app:cached
     env_file:
       - .env
     depends_on:
+      db:
+        condition: service_healthy
       rabbit:
         condition: service_healthy
       web:
         condition: service_started
     restart: unless-stopped
+    # Fix permission issues
+    user: "1000:1000"  # or use $(id -u):$(id -g) on Linux
+    # Add proper shutdown handling
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
 
 volumes:
   postgres_data:
