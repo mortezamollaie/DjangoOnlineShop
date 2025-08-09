@@ -9,3 +9,4 @@ celery
 django-storages
 boto3
 pytz
+django-celery-beat
