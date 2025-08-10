@@ -5,18 +5,22 @@
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
-                <th scope="col">Handle</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Unit Price</th>
+                <th scope="col">Total Price</th>
             </tr>
         </thead>
         <tbody>
+            {% for item in cart %}
             <tr>
-                <th scope="row">1</th>
-                <td>John</td>
-                <td>Doe</td>
-                <td>@johndoe</td>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.total_price }}</td>
             </tr>
+            {% endfor %}
         </tbody>
     </table>    
 {% endblock %}
