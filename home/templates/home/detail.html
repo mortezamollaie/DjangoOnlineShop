@@ -7,4 +7,12 @@
     <img src="{{ product.image.url }}" alt="" class="w-25">
     <p>{{ product.description }}</p>
 
+    <br/><br/>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Add to Cart</button>
+    </form>
+
 {% endblock %}

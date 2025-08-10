@@ -6,3 +6,6 @@ class CartView(View):
         return render(request, 'orders/cart.html')
 
 
+class CartAddView(View):
+    def post(self, request, product_id):
+        pass
