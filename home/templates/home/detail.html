@@ -9,7 +9,7 @@
 
     <br/><br/>
 
-    <form action="" method="post">
+    <form action="{% url 'orders:cart_add' product.id %}" method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Add to Cart</button>
