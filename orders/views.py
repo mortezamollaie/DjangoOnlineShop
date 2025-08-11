@@ -56,11 +56,15 @@ ZP_API_REQUEST = 'https://api.zarinpal.com/pg/v4/payment/request.json'
 ZP_API_VERIFY = 'https://api.zarinpal.com/pg/v4/payment/verify.json'
 ZP_API_STARTPAY = 'https://www.zarinpal.com/pg/StartPay/{authority}'
 description = 'description for transaction'
-CallbackURL = 'http://localhost:8000/orders/verify/'
+CallbackURL = 'http://127.0.0.1:8000/orders/verify/'
+
 
 class OrderPayView(LoginRequiredMixin, View):
     def get(self, request, order_id):
         order = Order.objects.get(id=order_id)
+        request.session['order_pay'] = {
+            'order_id': order.id
+        }
         req_data = {
             'merchant_id': MERCHANT,
             'amount': order.get_total_price(),
@@ -79,3 +83,47 @@ class OrderPayView(LoginRequiredMixin, View):
             e_code = req.json()['errors']['code']
             e_message = req.json()['errors']['message']
             return HttpResponse(f"Error code: {e_code}, ErrorMessage: {e_message}")
+
+
+class OrderVerifyView(LoginRequiredMixin, View):
+    def get(self, request):
+        order_id = request.session['order_pay']['order_id']
+        order = Order.objects.get(id=int(order_id))
+        t_status = request.GET.get('Status')
+        t_authority = request.GET.get['Authority']
+        if request.GET.get('Status') == 'OK':
+            req_header = {"accept": "application/json",
+                          "content-type": "application/json"}
+            req_data = {
+                'merchant_id': MERCHANT,
+                'amount': order.get_total_price(),
+                'authority': t_authority
+            }
+
+            req = requests.post(url=ZP_API_REQUEST, data=json.dumps(req_data), headers=req_header)
+            if len(req.json()['errors']) == 0:
+                t_status = req.json()['data']['code']
+                # TODO: implement error page
+                if t_status == 100:
+                    order.paid = True
+                    order.save()
+                    return HttpResponse('Transaction success.\nRefID: ' + str(
+                        req.json()['data']['ref_id']
+                    ))
+                elif t_status == 101:
+                    return HttpResponse('Transaction submitted.\nRefID: ' + str(
+                        req.json()['data']['message']
+                    ))
+                else:
+                    return HttpResponse('Transaction failed.\nRefID: ' + str(
+                        req.json()['data']['message']
+                    ))
+
+            else:
+                e_code = req.json()['errors']['code']
+                e_message = req.json()['errors']['message']
+                return HttpResponse(f"Error code: {e_code}, ErrorMessage: {e_message}")
+
+        else:
+            return HttpResponse('Transaction failed or canceled by user')
+
